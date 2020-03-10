@@ -81,7 +81,9 @@ def user_delete(mailid):
     db.session.commit()
     return "user deleted from user and login table"
 
-############ Video Insertion into database ##########################################
+#######################################################################################################
+
+########################### Video Insertion into database ##########################################
 @app.route('/api/v1/incubator/resources/video/create', methods=['POST'])
 def video():
     values = []
@@ -96,7 +98,8 @@ def video():
     db.session.commit()
     return "Inserted into Video table and document table"
 
-################ Video Updation into database #######################
+#----------------------- Video Updation into database ----------------------------------------------------
+
 #curl -i -H "Content-Type: application/json" -X PUT -d '{"category":"seriuos"}' http://localhost:5000/api/v1/incubator/resources/video/update/1
 
 @app.route('/api/v1/incubator/resources/video/update/<int:v_id>', methods=['PUT'])
@@ -110,7 +113,7 @@ def vid_update(v_id):
     db.session.commit()
     return "sucess"
 
-################## Video Deletion from database #####################
+#--------------------------- Video Deletion from database ----------------------------------------------
 @app.route('/api/v1/incubator/resources/video/delete/<int:v_id>', methods=["DELETE"])
 def vid_delete(v_id):
     db.create_all()
@@ -119,7 +122,7 @@ def vid_delete(v_id):
     db.session.commit()
     return "record deleted\n"
 
-################## Video: read from database ##########################
+#------------------------ Video: read from database --------------------------------------------------
 #-------------------- all data -------------------------
 @app.route('/api/v1/incubator/resources/video/read', methods=['GET'])
 def vid_get():
@@ -149,10 +152,52 @@ def vid_getFew(id):
     # print(query_parameter)
     return jsonify(jlist)
 
+#######################################################################################################
 
+############################ Document table ##########################################################
+#---------------------------- Insert ---------------------------------------------------------
 
+@app.route('/api/v1/incubator/resources/document/insert', methods=['POST'])
+def doc_insert():
+    db.create_all()
+    
+    if not request.json:
+        return make_response({"json":"NO"})#abort(404)
 
+    find_vid = Video.query.filter_by(video_name=request.json['video_name']).first()
+    print(find_vid)
+    new_doc = Document(document_path_url=request.json['doc'], video_name=find_vid)
+    db.session.add(new_doc)
+    db.session.commit()
 
+    return "document inserted"
+
+#-------------------------------- Update ------------------------------------------------------------
+@app.route('/api/v1/incubator/resources/document/update', methods=['PUT'])
+def doc_update():
+    db.create_all()
+
+    if not request.json:
+        abort(404)
+    
+    find_vid = Video.query.filter_by(video_name=request.json['video_name']).first()
+    upd_doc = Document.query.filter_by(video_id=find_vid.id).first()
+    upd_doc.document_path_url = request.json['doc_path']
+    db.session.commit()
+    return "document updated"
+
+#--------------------------------- Delete -------------------------------------------------------------
+@app.route('/api/v1/incubator/resources/document/update/<video_name>', methods=['DELETE'])
+def doc_delete(video_name):
+    db.create_all()
+
+    find_vid = Video.query.filter_by(video_name=str(video_name)).first()
+    del_doc = Document.query.filter_by(video_id=find_vid.id).first()
+    db.session.delete(del_doc)
+    db.session.commit()
+    return "document deleted"
+
+#######################################################################################################
 
 
 
