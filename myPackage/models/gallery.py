@@ -7,11 +7,18 @@ class Video(db.Model):
     video_url = db.Column(db.String(200), nullable=False, unique=False)
     description = db.Column(db.String(500), nullable=True, unique=False)
     category = db.Column(db.String(50), nullable=True, unique=False)
+    
+    def __init__(self,video_name,video_url, description, category):
+        
+        self.video_name = video_name
+        self.video_url = video_url
+        self.description = description
+        self.category = category
 
     def __repr__(self):
         return self.video_name
     # one-many relationship with document table
-    documents = db.relationship('Document', backref='video_name', lazy = 'dynamic')
+    documents = db.relationship('Document', backref='video_name', lazy = True)
 
 ####### class model for document
 class Document(db.Model):
@@ -19,3 +26,5 @@ class Document(db.Model):
     video_id = db.Column(db.Integer, db.ForeignKey('video.id'))
     document_path_url = db.Column(db.String(200), nullable=False, unique=False)
 
+    def __repr__(self):
+        return str(self.video_id)

@@ -45,10 +45,34 @@ def videoDoc():
     db.session.add(doc)
     db.session.commit()
     return "Inserted into Video table and document table"
+
+################ Video Updation into database #######################
+#curl -i -H "Content-Type: application/json" -X PUT -d '{"category":"seriuos"}' http://localhost:5000/api/v1/incubator/resources/video/update/1
+
+@app.route('/api/v1/incubator/resources/video/update/<int:v_id>', methods=['PUT'])
+def vid_update(v_id):
+    db.create_all()
+    upd = Video.query.filter_by(id=v_id).first()
+    if not request.json:
+        abort(404)
+    print(type(request.json))
+    upd.category = request.json[list(request.json.keys())[0]] #request.json.get("category",upd.category)
+    db.session.commit()
+    return "sucess"
     
 @app.route('/query')
 def q():
     db.create_all()
-    print(User.query.all())
+    vname = 'jgas.mp4'
+    vurl = '.assests/video/jafids.mp4'
+    desc = 'jiogajsd nuaensf iuiew'
+    cat = 'funny'
+    vid = Video(vname, vurl, desc, cat)
+    db.session.add(vid)
+    doc = Document(document_path_url='j/sdg/asgasd/asg/jdsa.pdf',video_name=vid)
+    db.session.add(doc)
+    
+    db.session.commit()
+    print(Document.query.all())
     return "sucess"
     # # return jsonify({'data':User.query.all()}
