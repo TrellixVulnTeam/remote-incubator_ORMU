@@ -17,6 +17,7 @@ class Video(db.Model):
 
     def __repr__(self):
         return self.video_name
+        # jdata = {'id':id, 'video_name':self.video_name,'video_url':self.video_url,'description':self.description,'category':self.category}
     # one-many relationship with document table
     documents = db.relationship('Document', backref='video_name', lazy = True)
 

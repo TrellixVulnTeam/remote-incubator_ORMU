@@ -30,7 +30,7 @@ def regis():
 
 ############ Video Insertion into database #######################
 @app.route('/api/v1/incubator/resources/video/create', methods=['POST'])
-def videoDoc():
+def video():
     values = []
     if not request.json:
         abort(404)
@@ -38,11 +38,8 @@ def videoDoc():
         values.append(request.json[i])
     
     db.create_all()
-    vid = Video(video_name=values[0], video_url=values[1], description=values[2], category=values[3])
+    vid = Video(values[0],values[1], values[2], values[3])
     db.session.add(vid)
-    # adding documents to video
-    doc = Document(document_path_url="./assests/etc.pdf")
-    db.session.add(doc)
     db.session.commit()
     return "Inserted into Video table and document table"
 
@@ -59,9 +56,52 @@ def vid_update(v_id):
     upd.category = request.json[list(request.json.keys())[0]] #request.json.get("category",upd.category)
     db.session.commit()
     return "sucess"
+
+################## Video Deletion from database #####################
+@app.route('/api/v1/incubator/resources/video/delete/<int:v_id>', methods=["DELETE"])
+def vid_delete(v_id):
+    db.create_all()
+    de = Video.query.filter_by(id=v_id).first()
+    db.session.delete(de)
+    db.session.commit()
+    return "record deleted\n"
+
+################## Video: read from database ##########################
+#-------------------- all data -------------------------
+@app.route('/api/v1/incubator/resources/video/read', methods=['GET'])
+def vid_get():
+    db.create_all()
+    # result = db.engine.execute("SELECT * from video")
+    jlist = []
+    result = Video.query.all()
+    for i in result:
+        i.__dict__['_sa_instance_state']=str(i.__dict__['_sa_instance_state'])
+        jlist.append(i.__dict__)
+    print(jlist[0])
+    return  jsonify(jlist)
+
+# ------------------ one or few data ---------------
+@app.route('/api/v1/incubator/resources/video/read/id/<int:id>', methods=['GET'])
+def vid_getFew(id):
+    db.create_all()
+    result = Video.query.filter_by(id=int(id)).all()
+    # query_parameter = dict(request.args)
+    # if 'id' in query_parameter :
+    #     id=int(query_parameter.get('id'))
+    #     result = Video.query.filter_by(id=id).all()
+    jlist = []
+    for i in result:
+        i.__dict__['_sa_instance_state']=str(i.__dict__['_sa_instance_state'])
+        jlist.append(i.__dict__)
+    # print(query_parameter)
+    return jsonify(jlist)
+
+
+
     
 @app.route('/query')
 def q():
+    
     db.create_all()
     vname = 'jgas.mp4'
     vurl = '.assests/video/jafids.mp4'
