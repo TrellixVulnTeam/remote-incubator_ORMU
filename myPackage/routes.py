@@ -3,13 +3,15 @@ from myPackage.models.user import User, Login
 from myPackage.models.gallery import Video, Document
 from myPackage import app, db
 
-
+##################### home ##########################################################################
 @app.route('/')
 @app.route('/home')
 def home():
     return "<h1>REMOTE INCUBATOR</h1>"
+###################################################################################################
 
-########## user registration
+########################## user REGISTRATION & LOGIN ##########################################
+#-------------------- create or insert ------------------------------------------------
 @app.route('/api/v1/incubator/resources/user/registration/create',methods=['POST'])
 def regis():
     values =[]
@@ -28,12 +30,63 @@ def regis():
     
     return "value inserted in user and login tables"
 
-############ Video Insertion into database #######################
+#------------------------ update password -------------------------------------------------------
+@app.route('/api/v1/incubator/resources/user/registration/update/<mailid>', methods=['PUT'])
+def reg_update(mailid):
+    if not request.json:
+        abort(404)
+    db.create_all()
+    user_update = User.query.filter_by(email=str(mailid)).first()
+    user_update.password = request.json['psd'] 
+    log_update = Login.query.filter_by(log_in=str(mailid)).first()
+    log_update.password = request.json.get('psd')
+    db.session.commit()
+    print(request.json)
+    return "password updated"
+
+#--------------------------- update user ----------------------------------------------------------
+@app.route('/api/v1/incubator/resources/user/registration/update/user/<mailid>', methods=['PUT'])
+def reg_user_update(mailid):
+    db.create_all()
+
+    # update user table
+    upd = User.query.filter_by(email=str(mailid)).first()
+    upd.name = request.json['name']
+    upd.password = request.json['password']
+    upd.contact = request.json['contact']
+    upd.email = request.json['email']
+    upd.company = request.json['company']
+    upd.design = request.json['designation']
+    upd.why = request.json['why']
+    upd.address = request.json['address']
+
+    # update login table
+    lo = Login.query.filter_by(login_id=str(mailid)).first()
+    lo.login_id = request.json['email']
+    lo.password = request.json['password']
+
+    db.session.commit()
+
+    return "user updated"
+#------------------------------- delete user ------------------------------------------------------
+@app.route('/api/v1/incubator/resources/user/registration/delete/user/<mailid>', methods=['DELETE'])
+def user_delete(mailid):
+    db.create_all()
+    # delete from user table
+    d = User.query.filter_by(email=str(mailid)).first()
+    db.session.delete(d)
+    # delete from login table
+    ld = Login.query.filter_by(login_id=str(mailid)).first()
+    db.session.delete(ld)
+    db.session.commit()
+    return "user deleted from user and login table"
+
+############ Video Insertion into database ##########################################
 @app.route('/api/v1/incubator/resources/video/create', methods=['POST'])
 def video():
     values = []
     if not request.json:
-        abort(404)
+        return make_response({"json":"NO"})#abort(404)
     for i in request.json:
         values.append(request.json[i])
     
@@ -95,6 +148,11 @@ def vid_getFew(id):
         jlist.append(i.__dict__)
     # print(query_parameter)
     return jsonify(jlist)
+
+
+
+
+
 
 
 
