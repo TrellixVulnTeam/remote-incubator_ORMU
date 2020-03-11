@@ -81,7 +81,19 @@ def user_delete(mailid):
     db.session.commit()
     return "user deleted from user and login table"
 
-#######################################################################################################
+#----------------------------------- Read user ---------------------------------------------------
+@app.route('/api/v1/incubator/resources/registration/read', methods=['GET'])
+def user_read():
+    db.create_all()
+    # result = db.engine.execute("SELECT * from video")
+    jlist = []
+    result = User.query.all()
+    
+    for i in result:
+        i.__dict__['_sa_instance_state']=str(i.__dict__['_sa_instance_state'])
+        jlist.append(i.__dict__)
+    print(jlist[0])
+    return  jsonify(jlist)
 
 ############################## Feedback table ########################################################
 
