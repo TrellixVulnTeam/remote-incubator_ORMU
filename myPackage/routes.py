@@ -1,5 +1,5 @@
 from flask import jsonify, request, abort, make_response
-from myPackage.models.user import User, Login
+from myPackage.models.user import User, Login, Feedback
 from myPackage.models.gallery import Video, Document
 from myPackage import app, db
 
@@ -82,6 +82,59 @@ def user_delete(mailid):
     return "user deleted from user and login table"
 
 #######################################################################################################
+
+############################## Feedback table ########################################################
+
+#---------------------------------- POST service ----------------------------------------------------
+@app.route('/api/v1/incubator/resources/feedback/insert', methods=['POST'])
+def feedbk_insert():
+    db.create_all()
+    if not request.json:
+        abort(404)
+    find_user = User.query.filter_by(user_id=request.json['user_id']).first_or_404(description="user not found")
+    # print(find_user)
+    if find_user:
+        new_feedback = Feedback(feedback=request.json['feedback'], user=find_user)
+        db.session.add(new_feedback)
+    else:
+        abort(404)
+    db.session.commit()
+
+    return "feedback inserted"
+
+#------------------------------------ PUT service -----------------------------------------------------
+@app.route('/api/v1/incubator/resources/feedback/update', methods=['PUT'])
+def feedbk_update():
+    db.create_all()
+    upd = Feedback.query.filter_by(user_id=request.json['user_id']).first()
+    upd.feedback = request.json['feedback']
+    db.session.commit()
+
+    return "Feedback updated"
+
+#-----------------------------------DELETE service ---------------------------------------------------
+@app.route('/api/v1/incubator/resources/feedback/delete/<int:id>', methods=['DELETE'])
+def feedbk_delete(id):
+    db.create_all
+    de_fb = Feedback.query.filter_by(user_id=id).first()
+    db.session.delete(de_fb)
+    db.session.commit()
+
+    return "feedback deleted"
+
+#------------------------------------- GET service ---------------------------------------------------
+@app.route('/api/v1/incubator/resources/feedback/read', methods=['GET'])
+def feedbk_read():
+    db.create_all()
+    # result = db.engine.execute("SELECT * from video")
+    jlist = []
+    result = Feedback.query.all()
+    for i in result:
+        i.__dict__['_sa_instance_state']=str(i.__dict__['_sa_instance_state'])
+        jlist.append(i.__dict__)
+    print(jlist[0])
+    return  jsonify(jlist)
+
 
 ########################### Video Insertion into database ##########################################
 @app.route('/api/v1/incubator/resources/video/create', methods=['POST'])

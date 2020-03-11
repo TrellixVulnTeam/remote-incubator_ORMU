@@ -13,13 +13,14 @@ class User(db.Model):
     why = db.Column(db.String(100), unique=False, nullable=True)
     address = db.Column(db.String(100), unique=False, nullable=False)
 
+    feedbacks = db.relationship('Feedback', backref='user', cascade='all,delete')
+
     def __repr__(self):
         return self.name
 
 #     # one-many relationship with payment_table
-#     payments = db.relationship('Payment', backref='user', lazy='dynamic')
+    # payments = db.relationship('Payment', backref='user', lazy='dynamic')
 #     # one-many relationship with feedback table
-#     feedbacks = db.relationship('Feedback', backref='user', lazy='dynamic')
 #     # one-one relationship with address table
 #     address = db.relationship('Address', backref='user', lazy='dynamic')
     
@@ -40,10 +41,13 @@ class Login(db.Model):
 #     status = db.Column(db.Boolean,nullable=False)
 
 # ######## class model for feedback table
-# class Feedback(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
-#     feedback = db.Column(db.String(500),nullable=True, unique=False)
+class Feedback(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    feedback = db.Column(db.String(500),nullable=True, unique=False)
+
+    def __repr__(self):
+        return '<Feedback %r>' % self.user_id
 
 # ########## class model for address table
 # class Address(db.Model):
