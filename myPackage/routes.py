@@ -102,23 +102,33 @@ def video():
 
 #curl -i -H "Content-Type: application/json" -X PUT -d '{"category":"seriuos"}' http://localhost:5000/api/v1/incubator/resources/video/update/1
 
-@app.route('/api/v1/incubator/resources/video/update/<int:v_id>', methods=['PUT'])
-def vid_update(v_id):
+@app.route('/api/v1/incubator/resources/video/update', methods=['PUT'])
+def vid_update():
     db.create_all()
-    upd = Video.query.filter_by(id=v_id).first()
+    print(request.json)
+    upd = Video.query.filter_by(video_name=request.json['video_name']).first_or_404(description='record')
     if not request.json:
         abort(404)
     print(type(request.json))
-    upd.category = request.json[list(request.json.keys())[0]] #request.json.get("category",upd.category)
+    upd.video_name = request.json['video_name']
+    upd.video_url = request.json['video_url']
+    upd.description = request.json['description']
+    upd.category = request.json['category'] #request.json.get("category",upd.category)
     db.session.commit()
     return "sucess"
 
 #--------------------------- Video Deletion from database ----------------------------------------------
 @app.route('/api/v1/incubator/resources/video/delete/<int:v_id>', methods=["DELETE"])
 def vid_delete(v_id):
+    print(type(v_id))
     db.create_all()
     # find_doc = Document.query.filter_by()
     de = Video.query.filter_by(id=v_id).first()
+    
+    # delete related documents
+    docs = Document.query.filter_by(video_id=de.id).delete()
+    print(docs)
+    # db.session.delete(docs)
     db.session.delete(de)
     db.session.commit()
     return "record deleted\n"
