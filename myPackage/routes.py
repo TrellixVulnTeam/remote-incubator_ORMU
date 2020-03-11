@@ -189,15 +189,30 @@ def doc_update():
     return "document updated"
 
 #--------------------------------- Delete -------------------------------------------------------------
-@app.route('/api/v1/incubator/resources/document/update/<video_name>', methods=['DELETE'])
+@app.route('/api/v1/incubator/resources/document/delete/<video_name>', methods=['DELETE'])
 def doc_delete(video_name):
     db.create_all()
 
-    find_vid = Video.query.filter_by(video_name=str(video_name)).first()
-    del_doc = Document.query.filter_by(video_id=find_vid.id).first()
+    find_vid = Video.query.filter_by(video_name=str(video_name)).first_or_404(description='record: {} not found'.format(video_name))
+    print(find_vid)
+    del_doc = Document.query.filter_by(video_id=find_vid.id).first_or_404(description='record: {} not found'.format(video_name))
+    print(del_doc)
     db.session.delete(del_doc)
     db.session.commit()
     return "document deleted"
+
+# -----------------------------------GET ----------------------------------------------------------
+@app.route('/api/v1/incubator/resources/document/read', methods=['GET'])
+def doc_read():
+    db.create_all()
+    # result = db.engine.execute("SELECT * from video")
+    jlist = []
+    result = Document.query.all()
+    for i in result:
+        i.__dict__['_sa_instance_state']=str(i.__dict__['_sa_instance_state'])
+        jlist.append(i.__dict__)
+    print(jlist[0])
+    return  jsonify(jlist)
 
 #######################################################################################################
 
