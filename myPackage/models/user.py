@@ -13,16 +13,18 @@ class User(db.Model):
     why = db.Column(db.String(100), unique=False, nullable=True)
     address = db.Column(db.String(100), unique=False, nullable=False)
 
+    # one-many relationship with feedback table
     feedbacks = db.relationship('Feedback', backref='user', cascade='all,delete')
+    # one-many relationship with payment_table
+    payments = db.relationship('Payment', backref='user')
+    # one-one relationship with address table
+    address = db.relationship('Address', backref='user', lazy='dynamic')
 
     def __repr__(self):
         return self.name
 
-#     # one-many relationship with payment_table
-    # payments = db.relationship('Payment', backref='user', lazy='dynamic')
-#     # one-many relationship with feedback table
-#     # one-one relationship with address table
-#     address = db.relationship('Address', backref='user', lazy='dynamic')
+   
+    
     
     
 ###### class model for login table
@@ -32,13 +34,13 @@ class Login(db.Model):
     password = db.Column(db.String(100))
 
 
-# ######## class model for payment table
-# class Payment(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
-#     txn_id = db.Column(db.String(100), unique=True, nullable=False)
-#     payment_amout = db.Column(db.Float, nullable=False)
-#     status = db.Column(db.Boolean,nullable=False)
+######## class model for payment table
+class Payment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    txn_id = db.Column(db.String(100), unique=True, nullable=False)
+    payment_amout = db.Column(db.Float, nullable=False)
+    status = db.Column(db.Boolean,nullable=False)
 
 # ######## class model for feedback table
 class Feedback(db.Model):
@@ -49,15 +51,18 @@ class Feedback(db.Model):
     def __repr__(self):
         return '<Feedback %r>' % self.user_id
 
-# ########## class model for address table
-# class Address(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
-#     addr_line1 = db.Column(db.String(200))
-#     addr_line2 = db.Column(db.String(200))
-#     country = db.Column(db.String(30), nullable=False,unique=False)
-#     state = db.Column(db.String(30), nullable=False, unique=False)
-#     city = db.Column(db.String(30), nullable=False, unique=False)
+########## class model for address table
+class Address(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    addr_line1 = db.Column(db.String(200))
+    addr_line2 = db.Column(db.String(200))
+    country = db.Column(db.String(30), nullable=False,unique=False)
+    state = db.Column(db.String(30), nullable=False, unique=False)
+    city = db.Column(db.String(30), nullable=False, unique=False)
+
+    def __repr__(self):
+        return '<user_id %r>' %self.user_id
 
 
 

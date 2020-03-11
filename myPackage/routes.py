@@ -1,5 +1,5 @@
 from flask import jsonify, request, abort, make_response
-from myPackage.models.user import User, Login, Feedback
+from myPackage.models.user import User, Login, Feedback, Payment, Address
 from myPackage.models.gallery import Video, Document
 from myPackage import app, db
 
@@ -135,6 +135,142 @@ def feedbk_read():
     print(jlist[0])
     return  jsonify(jlist)
 
+######################################################################################################
+
+
+############################ Payment table ##########################################################
+#---------------------------- Insert ---------------------------------------------------------
+
+@app.route('/api/v1/incubator/resources/payment/insert', methods=['POST'])
+def pay_insert():
+    db.create_all()
+    
+    if not request.json:
+        return make_response({"json":"NO"})#abort(404)
+    find_user = User.query.filter_by(user_id=request.json['user_id']).first_or_404(description='there is no data with {}'.format(request.json['user_id']))
+
+    if find_user:
+        new_pay = Payment(txn_id=request.json['txn'], payment_amout=request.json['pay_amout'],status=request.json['status'], user=find_user)
+        db.session.add(new_pay)
+    else:
+        abort(404)
+    db.session.commit()
+
+    return "payment made successfully"
+
+#-------------------------------- Update ------------------------------------------------------------
+@app.route('/api/v1/incubator/resources/payment/update', methods=['PUT'])
+def pay_update():
+    db.create_all()
+
+    if not request.json:
+        abort(404)
+    
+    find_user = User.query.filter_by(user_id=request.json['user_id']).first_or_404(description='record not found')
+    upd_pay = Payment.query.filter_by(user_id=find_user.user_id).first()
+    upd_pay.payment_amout = request.json['pay_amout']
+    upd_pay.status = request.json['status']
+    db.session.commit()
+    return "payment updated"
+
+#--------------------------------- Delete -------------------------------------------------------------
+@app.route('/api/v1/incubator/resources/payment/delete/<id_>', methods=['DELETE'])
+def pay_delete(id_):
+    db.create_all()
+
+    find_user = User.query.filter_by(user_id=int(id_)).first_or_404(description='record: not found')
+    # print(find_vid)
+    del_pay = Payment.query.filter_by(user_id=find_user.user_id).first_or_404(description='record: {} not found')
+    print(del_pay)
+    db.session.delete(del_pay)
+    db.session.commit()
+    return "payment deleted"
+
+# -----------------------------------GET ----------------------------------------------------------
+@app.route('/api/v1/incubator/resources/payment/read', methods=['GET'])
+def pay_read():
+    db.create_all()
+    # result = db.engine.execute("SELECT * from video")
+    jlist = []
+    result = Payment.query.all()
+    print(result)
+    for i in result:
+        i.__dict__['_sa_instance_state']=str(i.__dict__['_sa_instance_state'])
+        jlist.append(i.__dict__)
+    return  jsonify(jlist)
+
+#######################################################################################################
+
+
+#################################### ADDRESS TABLE ####################################################
+#---------------------------- Insert ---------------------------------------------------------
+
+@app.route('/api/v1/incubator/resources/address/insert', methods=['POST'])
+def addr_insert():
+    db.create_all()
+    values=[]
+    if not request.json:
+        return make_response({"json":"NO"})#abort(404)
+    else:
+        for i in request.json:
+            values.append(request.json[i])
+
+    find_user = User.query.filter_by(user_id=values[0]).first_or_404(description='there is no data with {}'.format(values[0]))
+
+    if find_user:
+        add_addr = Address(addr_line1=values[1], addr_line2=values[2], country=values[3], state=values[4], city=values[5], user=find_user)
+        db.session.add(add_addr)
+    else:
+        abort(404)
+    db.session.commit()
+
+    return "Address inserted"
+
+#-------------------------------- Update ------------------------------------------------------------
+@app.route('/api/v1/incubator/resources/address/update', methods=['PUT'])
+def addr_update():
+    db.create_all()
+
+    if not request.json:
+        abort(404)
+    
+    find_user = User.query.filter_by(user_id=request.json['user_id']).first_or_404(description='record not found')
+    upd = Address.query.filter_by(user_id=find_user.user_id).first()
+    upd.addr_line1 = request.json['addr1']
+    upd.addr_line2 = request.json['addr2']
+    upd.country = request.json['country']
+    upd.state = request.json['state']
+    upd.city = request.json['city']
+    db.session.commit()
+    return "Address updated"
+
+#--------------------------------- Delete -------------------------------------------------------------
+@app.route('/api/v1/incubator/resources/address/delete/<id_>', methods=['DELETE'])
+def addr_delete(id_):
+    db.create_all()
+
+    find_user = User.query.filter_by(user_id=int(id_)).first_or_404(description='record: not found')
+    
+    del_addr = Address.query.filter_by(user_id=find_user.user_id).first_or_404(description='record: {} not found')
+    
+    db.session.delete(del_addr)
+    db.session.commit()
+    return "address deleted"
+
+# -----------------------------------GET ----------------------------------------------------------
+@app.route('/api/v1/incubator/resources/address/read', methods=['GET'])
+def addr_read():
+    db.create_all()
+    # result = db.engine.execute("SELECT * from video")
+    jlist = []
+    result = Address.query.all()
+    print(result)
+    for i in result:
+        i.__dict__['_sa_instance_state']=str(i.__dict__['_sa_instance_state'])
+        jlist.append(i.__dict__)
+    return  jsonify(jlist)
+
+######################################################################################################
 
 ########################### Video Insertion into database ##########################################
 @app.route('/api/v1/incubator/resources/video/create', methods=['POST'])
