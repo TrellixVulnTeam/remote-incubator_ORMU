@@ -164,11 +164,12 @@ def doc_insert():
     
     if not request.json:
         return make_response({"json":"NO"})#abort(404)
-
-    find_vid = Video.query.filter_by(video_name=request.json['video_name']).first()
-    print(find_vid)
-    new_doc = Document(document_path_url=request.json['doc'], video_name=find_vid)
-    db.session.add(new_doc)
+    find_vid = Video.query.filter_by(video_name=request.json['video_name']).first_or_404(description='there is no data with {}'.format(request.json['video_name']))
+    if find_vid:
+        new_doc = Document(document_path_url=request.json['doc'], video_name=find_vid)
+        db.session.add(new_doc)
+    else:
+        abort(404)
     db.session.commit()
 
     return "document inserted"
