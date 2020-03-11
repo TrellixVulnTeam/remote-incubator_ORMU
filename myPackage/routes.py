@@ -38,8 +38,8 @@ def reg_update(mailid):
     db.create_all()
     user_update = User.query.filter_by(email=str(mailid)).first()
     user_update.password = request.json['psd'] 
-    log_update = Login.query.filter_by(log_in=str(mailid)).first()
-    log_update.password = request.json.get('psd')
+    log_update = Login.query.filter_by(login_id=str(mailid)).first()
+    log_update.password = request.json['psd']
     db.session.commit()
     print(request.json)
     return "password updated"
@@ -117,6 +117,7 @@ def vid_update(v_id):
 @app.route('/api/v1/incubator/resources/video/delete/<int:v_id>', methods=["DELETE"])
 def vid_delete(v_id):
     db.create_all()
+    # find_doc = Document.query.filter_by()
     de = Video.query.filter_by(id=v_id).first()
     db.session.delete(de)
     db.session.commit()
@@ -136,7 +137,7 @@ def vid_get():
     print(jlist[0])
     return  jsonify(jlist)
 
-# ------------------ one or few data ---------------
+# ------------------ one or few data ------------------------------------------------------------
 @app.route('/api/v1/incubator/resources/video/read/id/<int:id>', methods=['GET'])
 def vid_getFew(id):
     db.create_all()
