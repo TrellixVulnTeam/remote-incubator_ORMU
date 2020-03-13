@@ -18,7 +18,7 @@ class User(db.Model):
     # one-many relationship with payment_table
     payments = db.relationship('Payment', backref='user')
     # one-one relationship with address table
-    address = db.relationship('Address', backref='user', lazy='dynamic')
+    addresses = db.relationship('Address', backref='user')
 
     def __repr__(self):
         return self.name

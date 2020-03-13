@@ -3,6 +3,7 @@ from myPackage.models.user import User, Login, Feedback, Payment, Address
 from myPackage.models.gallery import Video, Document
 from myPackage import app, db
 
+from myPackage.mail.generateMail import sendMailTo
 
 ##################### home ##########################################################################
 @app.route('/')
@@ -15,20 +16,23 @@ def home():
 #-------------------- create or insert ------------------------------------------------
 @app.route('/api/v1/incubator/resources/user/registration/create',methods=['POST'])
 def regis():
+    db.create_all()
     values =[]
     if not request.json:
         abort(404)
     for i in request.json:
         values.append(request.json[i])
-
-    db.create_all()
+    print(values)
     new_user = User(name=values[0],password=values[1],contact=values[2],email=values[3],company=values[4],design=values[5],why=values[6],address=values[7])
     log = Login(id=new_user.user_id, login_id=new_user.email, password=new_user.password)
-
     db.session.add(new_user)
     db.session.add(log)
     db.session.commit()
-    
+
+    # send registration mail to user
+    find_user = User.query.filter_by(email=values[3]).first()
+    print("receiver email address: ",values[3])
+    sendMailTo(values[3])
     return "value inserted in user and login tables"
 
 #------------------------ update password -------------------------------------------------------
