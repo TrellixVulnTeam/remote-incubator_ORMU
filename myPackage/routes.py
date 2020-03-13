@@ -3,6 +3,7 @@ from myPackage.models.user import User, Login, Feedback, Payment, Address
 from myPackage.models.gallery import Video, Document
 from myPackage import app, db
 
+
 ##################### home ##########################################################################
 @app.route('/')
 @app.route('/home')
