@@ -3,7 +3,11 @@ from myPackage.models.user import User, Login, Feedback, Payment, Address
 from myPackage.models.gallery import Video, Document
 from myPackage import app, db
 
+from myPackage.payment.order_id import OrderId
+
 from myPackage.mail.generateMail import sendMailTo
+
+import json
 
 ##################### home ##########################################################################
 @app.route('/')
@@ -90,9 +94,10 @@ def user_delete(mailid):
 @app.route('/api/v1/incubator/resources/registration/read', methods=['GET'])
 def user_read():
     db.create_all()
-    # result = db.engine.execute("SELECT * from video")
+    result = db.engine.execute("SELECT * from video")
     jlist = []
     result = User.query.all()
+    print(result)
     
     for i in result:
         i.__dict__['_sa_instance_state']=str(i.__dict__['_sa_instance_state'])
@@ -430,25 +435,24 @@ def doc_read():
     print(jlist[0])
     return  jsonify(jlist)
 
+
 #######################################################################################################
 
 
-
+######################################## PAYMENT GATEWAY ##############################################
+@app.route('/api/v1/incubator/resources/orderid', methods=['POST'])
+def orderid():
+    item = OrderId(request.json)
+    item = item.get_with_id()
+    convert_to_json_item = json.dumps(item)
+    json_item = json.loads(convert_to_json_item)
+    print(json_item)
+    return jsonify(json_item)
     
-@app.route('/query')
+@app.route('/orderid')
 def q():
-    
-    db.create_all()
-    vname = 'jgas.mp4'
-    vurl = '.assests/video/jafids.mp4'
-    desc = 'jiogajsd nuaensf iuiew'
-    cat = 'funny'
-    vid = Video(vname, vurl, desc, cat)
-    db.session.add(vid)
-    doc = Document(document_path_url='j/sdg/asgasd/asg/jdsa.pdf',video_name=vid)
-    db.session.add(doc)
-    
-    db.session.commit()
-    print(Document.query.all())
-    return "sucess"
+    # DATA={'amount':1000,'currency':'INR','receipt':"my_recept",'payment_capture':0}
+    # item_1 = OrderId(DATA)
+    # print(item_1)
+    return "sucess", 201
     # # return jsonify({'data':User.query.all()}
