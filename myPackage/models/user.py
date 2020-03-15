@@ -19,6 +19,8 @@ class User(db.Model):
     payments = db.relationship('Payment', backref='user')
     # one-one relationship with address table
     addresses = db.relationship('Address', backref='user')
+    # one-one relationship with subscription table
+    subs = db.relationship('Subscription', backref='user', uselist=False, lazy=True)
 
     def __repr__(self):
         return self.name
@@ -63,6 +65,16 @@ class Address(db.Model):
 
     def __repr__(self):
         return '<user_id %r>' %self.user_id
+
+############# class model for subscription table
+class Subscription(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), primary_key=True)
+    subs_start = db.Column(db.DateTime, nullable=False)
+    subs_end = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return '<user_id %r' %self.user_id
 
 
 
