@@ -1,4 +1,4 @@
-from myPackage.payment import client
+from myPackage.models import client
 
 # Create  new order
 class OrderId:

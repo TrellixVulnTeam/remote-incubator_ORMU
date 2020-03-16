@@ -3,7 +3,7 @@ from myPackage.models.user import User, Login, Feedback, Payment, Address
 from myPackage.models.gallery import Video, Document
 from myPackage import app, db
 
-from myPackage.payment.order_id import OrderId
+from myPackage.models.order_id import OrderId
 
 from myPackage.mail.generateMail import sendMailTo
 
