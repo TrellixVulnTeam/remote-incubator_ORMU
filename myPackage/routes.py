@@ -1,7 +1,8 @@
-from flask import jsonify, request, abort, make_response
+from flask import jsonify, request, abort, make_response, render_template
 from myPackage.models.user import User, Login, Feedback, Payment, Address, Subscription
 from myPackage.models.gallery import Video, Document
 from myPackage import app, db
+from myPackage.models import razorpay_key
 
 from myPackage.models.order_id import OrderId
 
@@ -14,7 +15,15 @@ import datetime
 @app.route('/')
 @app.route('/home')
 def home():
-    return "<h1>REMOTE INCUBATOR</h1>"
+    key = razorpay_key
+    # print(key)
+    oid = orderid()
+    # print(oid)
+    return render_template('pay.html',key=key,oid=oid)
+
+@app.route('/home/success', methods=['POST'])
+def successPay():
+    return "Payment successful"
 ###################################################################################################
 
 ########################## user REGISTRATION & LOGIN ##########################################
@@ -456,12 +465,13 @@ def doc_read():
 ######################################## PAYMENT GATEWAY ##############################################
 @app.route('/api/v1/incubator/resources/orderid', methods=['POST'])
 def orderid():
-    item = OrderId(request.json)
+    DATA={'amount':1000,'currency':'INR','receipt':"my_recept",'payment_capture':0}
+    item = OrderId(DATA)
     item = item.get_with_id()
     convert_to_json_item = json.dumps(item)
     json_item = json.loads(convert_to_json_item)
-    print(json_item)
-    return jsonify(json_item)
+    # print(json_item)
+    return str(json_item)
     
 @app.route('/orderid')
 def q():

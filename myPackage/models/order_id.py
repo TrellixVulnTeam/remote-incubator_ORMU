@@ -6,4 +6,4 @@ class OrderId:
         self.item_with_order_id = client.order.create(data=json_data) 
         
     def get_with_id(self):
-        return self.item_with_order_id
+        return self.item_with_order_id['id']
