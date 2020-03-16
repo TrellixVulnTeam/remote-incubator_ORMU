@@ -13,14 +13,16 @@ class User(db.Model):
     why = db.Column(db.String(100), unique=False, nullable=True)
     address = db.Column(db.String(100), unique=False, nullable=False)
 
+    # one-one relationship with login table
+    log = db.relationship('Login', backref='user',uselist=False)
     # one-many relationship with feedback table
-    feedbacks = db.relationship('Feedback', backref='user', cascade='all,delete')
+    feedbacks = db.relationship('Feedback', backref='user')
     # one-many relationship with payment_table
     payments = db.relationship('Payment', backref='user')
     # one-one relationship with address table
     addresses = db.relationship('Address', backref='user')
     # one-one relationship with subscription table
-    subs = db.relationship('Subscription', backref='user', uselist=False, lazy=True)
+    subs = db.relationship('Subscription', backref='user', uselist=False)
 
     def __repr__(self):
         return self.name
@@ -32,6 +34,7 @@ class User(db.Model):
 ###### class model for login table
 class Login(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     login_id = db.Column(db.String(100))
     password = db.Column(db.String(100))
 
@@ -68,11 +71,12 @@ class Address(db.Model):
 
 ############# class model for subscription table
 class Subscription(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     subs_start = db.Column(db.DateTime, nullable=False)
     subs_end = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.Integer, nullable=False)
-
+    
     def __repr__(self):
         return '<user_id %r' %self.user_id
 

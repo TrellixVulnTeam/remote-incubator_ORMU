@@ -1,5 +1,5 @@
 from flask import jsonify, request, abort, make_response
-from myPackage.models.user import User, Login, Feedback, Payment, Address
+from myPackage.models.user import User, Login, Feedback, Payment, Address, Subscription
 from myPackage.models.gallery import Video, Document
 from myPackage import app, db
 
@@ -8,6 +8,7 @@ from myPackage.models.order_id import OrderId
 from myPackage.mail.generateMail import sendMailTo
 
 import json
+import datetime
 
 ##################### home ##########################################################################
 @app.route('/')
@@ -26,10 +27,23 @@ def regis():
         abort(404)
     for i in request.json:
         values.append(request.json[i])
-    print(values)
+    # print(values)
+    # Adding to user table
     new_user = User(name=values[0],password=values[1],contact=values[2],email=values[3],company=values[4],design=values[5],why=values[6],address=values[7])
-    log = Login(id=new_user.user_id, login_id=new_user.email, password=new_user.password)
     db.session.add(new_user)
+    uid = new_user.user_id
+    print(new_user.__dict__)
+    
+    # Adding to login table
+    log = Login(login_id=new_user.email, password=new_user.password, user=new_user)
+    print(log)
+    # Adding to subscription table
+    start_date = datetime.datetime.strptime(values[8], '%Y-%m-%d').date()
+    end_date = start_date + datetime.timedelta(365)
+    subs = Subscription(subs_start=start_date, subs_end=end_date, status=values[9], user=new_user)
+    
+    db.session.add(subs)
+    
     db.session.add(log)
     db.session.commit()
 
