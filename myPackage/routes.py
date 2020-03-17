@@ -35,7 +35,7 @@ def regis():
     find_user = User.query.filter_by(email=request.json['email']).first()
     if find_user:
         return make_response({'news':'someone already registered with this email'}), 405
-        
+     ##############################################   
     values =[]
     if not request.json:
         abort(404)
@@ -52,9 +52,9 @@ def regis():
     log = Login(login_id=new_user.email, password=new_user.password, user=new_user)
     print(log)
     # Adding to subscription table
-    start_date = datetime.datetime.strptime(values[8], '%Y-%m-%d').date()
+    start_date = datetime.datetime.now().date()#datetime.datetime.strptime(values[8], '%Y-%m-%d').date()
     end_date = start_date + datetime.timedelta(365)
-    subs = Subscription(subs_start=start_date, subs_end=end_date, status=values[9], user=new_user)
+    subs = Subscription(subs_start=start_date, subs_end=end_date, status=values[8], user=new_user)
     
     db.session.add(subs)
     
