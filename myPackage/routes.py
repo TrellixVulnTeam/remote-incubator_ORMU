@@ -31,6 +31,11 @@ def successPay():
 @app.route('/api/v1/incubator/resources/user/registration/create',methods=['POST'])
 def regis():
     db.create_all()
+    ########## user validation #####################3
+    find_user = User.query.filter_by(email=request.json['email']).first()
+    if find_user:
+        return make_response({'news':'someone already registered with this email'}), 405
+        
     values =[]
     if not request.json:
         abort(404)
