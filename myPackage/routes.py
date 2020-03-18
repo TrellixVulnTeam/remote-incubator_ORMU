@@ -1,4 +1,4 @@
-from flask import jsonify, request, abort, make_response, render_template
+from flask import jsonify, request, abort, make_response, render_template, request
 from myPackage.models.user import User, Login, Feedback, Payment, Address, Subscription
 from myPackage.models.gallery import Video, Document
 from myPackage import app, db
@@ -10,6 +10,24 @@ from myPackage.mail.generateMail import sendMailTo
 
 import json
 import datetime
+import jwt
+import requests
+import base64
+
+####### JSON web token authentication ################
+@app.route('/unprotected')
+def unprotectd():
+    return "<h1>This is unprotected page.....</h1>"
+
+@app.route('/protected')
+def protected():
+    return "<h1>This is protected page</h1>"
+
+@app.route('/login')
+def login():
+    print(request.authorization)
+    return "Worked"
+
 
 ##################### home ##########################################################################
 @app.route('/')
