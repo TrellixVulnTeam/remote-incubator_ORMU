@@ -13,124 +13,122 @@ import datetime
 import jwt
 import requests
 
+##### Allow database functionality ###########
+db.create_all()
+############################################
+
 ##################### home ##########################################################################
 @app.route('/')
 @app.route('/home')
-def home():
-    key = razorpay_key
-    # print(key)
-    oid = orderid()
-    # print(oid)
-    return render_template('pay.html',key=key,oid=oid)
+def index():
+    return make_response({'Hi':'REmote incubator'})
 
-@app.route('/home/success', methods=['POST'])
-def successPay():
-    return "Payment successful"
 ###################################################################################################
 
 ########################## user REGISTRATION & LOGIN ##########################################
 #-------------------- create or insert ------------------------------------------------
 @app.route('/api/v1/incubator/resources/user/registration/create',methods=['POST'])
 def regis():
-    db.create_all()
+    # db.create_all()
     ########## user validation #####################3
     find_user = User.query.filter_by(email=request.json['email']).first()
     if find_user:
-        return make_response({'news':'someone already registered with this email'}), 405
+        return make_response({'sorry':'someone already registered with this email'}), 405
      ##############################################   
-    values =[]
+    
     if not request.json:
-        abort(404)
+        return make_response({'oops':'no json data provided'})
+    
+    values = []
     for i in request.json:
         values.append(request.json[i])
     # print(values)
     # Adding to user table
-    new_user = User(name=values[0],password=values[1],contact=values[2],email=values[3],company=values[4],design=values[5],why=values[6],address=values[7])
+    new_user = User(name=values[0],contact=values[2],email=values[3],company=values[4],design=values[5],why=values[6],address=values[7])
     db.session.add(new_user)
     uid = new_user.user_id
     print(new_user.__dict__)
     
     # Adding to login table
-    log = Login(login_id=new_user.email, password=new_user.password, user=new_user)
+    log = Login(login_id=new_user.email, password=values[1], user=new_user)
     print(log)
-    # Adding to subscription table
-    start_date = datetime.datetime.now().date()#datetime.datetime.strptime(values[8], '%Y-%m-%d').date()
-    end_date = start_date + datetime.timedelta(365)
-    subs = Subscription(subs_start=start_date, subs_end=end_date, status=values[8], user=new_user)
-    
-    db.session.add(subs)
     
     db.session.add(log)
     db.session.commit()
-
-    # send registration mail to user
-    find_user = User.query.filter_by(email=values[3]).first()
-    print("receiver email address: ",values[3])
-    sendMailTo(values[3])
-    return "value inserted in user and login tables"
+    return jsonify({'succeed':"value inserted in user and login tables"}), 201
 
 #------------------------ update password -------------------------------------------------------
 @app.route('/api/v1/incubator/resources/user/registration/update/<mailid>', methods=['PUT'])
 def reg_update(mailid):
     if not request.json:
         abort(404)
-    db.create_all()
-    user_update = User.query.filter_by(email=str(mailid)).first()
+    # db.create_all()
+    user_update = Login.query.filter_by(login_id=str(mailid)).first()
+    # validate user
+    if not user_update:
+        return make_response({'OOPS':'Invalid email'})
     user_update.password = request.json['psd'] 
-    log_update = Login.query.filter_by(login_id=str(mailid)).first()
-    log_update.password = request.json['psd']
+    # log_update = Login.query.filter_by(login_id=str(mailid)).first()
+    # log_update.password = request.json['psd']
     db.session.commit()
     print(request.json)
-    return "password updated"
+    return jsonify({'succeed':'password updated'})
 
-#--------------------------- update user ----------------------------------------------------------
+#--------------------------- update user (update everything)----------------------------------------------------------
 @app.route('/api/v1/incubator/resources/user/registration/update/user/<mailid>', methods=['PUT'])
 def reg_user_update(mailid):
-    db.create_all()
+    # db.create_all()
 
     # update user table
     upd = User.query.filter_by(email=str(mailid)).first()
+    # validating upd
+    if not upd:
+        return jsonify({'sorry':'no data found'})
     upd.name = request.json['name']
-    upd.password = request.json['password']
     upd.contact = request.json['contact']
     upd.email = request.json['email']
     upd.company = request.json['company']
     upd.design = request.json['designation']
     upd.why = request.json['why']
     upd.address = request.json['address']
+    # update password in login table
+    log = Login.query.filter_by(login_id=request.json['email'])
+    if not log:
+        return jsonify({'Sorry':'No date found'})
 
-    # update login table
-    lo = Login.query.filter_by(login_id=str(mailid)).first()
-    lo.login_id = request.json['email']
-    lo.password = request.json['password']
+    log.password = request.json['password']
 
     db.session.commit()
 
-    return "user updated"
+    return jsonify({'database':'user updated'}), 200 # or 204
 #------------------------------- delete user ------------------------------------------------------
 @app.route('/api/v1/incubator/resources/user/registration/delete/user/<mailid>', methods=['DELETE'])
 def user_delete(mailid):
-    db.create_all()
+    # db.create_all()
     # delete from user table
     d = User.query.filter_by(email=str(mailid)).first()
+    if not d:
+        return jsonify({'sorry':'no user found'})
     db.session.delete(d)
     # delete from login table
     ld = Login.query.filter_by(login_id=str(mailid)).first()
     db.session.delete(ld)
     db.session.commit()
-    return "user deleted from user and login table"
+    return jsonify({'succeed':"user deleted from user and login table"})
 
 #----------------------------------- Read user ---------------------------------------------------
 @app.route('/api/v1/incubator/resources/registration/read', methods=['GET'])
 def user_read():
-    db.create_all()
+    # db.create_all()
     result = db.engine.execute("SELECT * from video")
     jlist = []
-    result = User.query.all()
+    result = User.query.all() 
+    print("this is from database: ",result)
     print(result)
     
     for i in result:
         i.__dict__['_sa_instance_state']=str(i.__dict__['_sa_instance_state'])
+        i.__dict__.pop('_sa_instance_state')
         jlist.append(i.__dict__)
     print(jlist[0])
     return  jsonify(jlist)
@@ -140,7 +138,7 @@ def user_read():
 #---------------------------------- POST service ----------------------------------------------------
 @app.route('/api/v1/incubator/resources/feedback/insert', methods=['POST'])
 def feedbk_insert():
-    db.create_all()
+    # db.create_all()
     if not request.json:
         abort(404)
     find_user = User.query.filter_by(user_id=request.json['user_id']).first_or_404(description="user not found")
@@ -157,7 +155,7 @@ def feedbk_insert():
 #------------------------------------ PUT service -----------------------------------------------------
 @app.route('/api/v1/incubator/resources/feedback/update', methods=['PUT'])
 def feedbk_update():
-    db.create_all()
+    # db.create_all()
     upd = Feedback.query.filter_by(user_id=request.json['user_id']).first()
     upd.feedback = request.json['feedback']
     db.session.commit()
@@ -167,7 +165,7 @@ def feedbk_update():
 #-----------------------------------DELETE service ---------------------------------------------------
 @app.route('/api/v1/incubator/resources/feedback/delete/<int:id>', methods=['DELETE'])
 def feedbk_delete(id):
-    db.create_all
+    # db.create_all
     de_fb = Feedback.query.filter_by(user_id=id).first()
     db.session.delete(de_fb)
     db.session.commit()
@@ -177,7 +175,7 @@ def feedbk_delete(id):
 #------------------------------------- GET service ---------------------------------------------------
 @app.route('/api/v1/incubator/resources/feedback/read', methods=['GET'])
 def feedbk_read():
-    db.create_all()
+    # db.create_all()
     # result = db.engine.execute("SELECT * from video")
     jlist = []
     result = Feedback.query.all()
@@ -190,12 +188,11 @@ def feedbk_read():
 ######################################################################################################
 
 
-############################ Payment table ##########################################################
 #---------------------------- Insert ---------------------------------------------------------
 
 @app.route('/api/v1/incubator/resources/payment/insert', methods=['POST'])
 def pay_insert():
-    db.create_all()
+    # db.create_all()
     
     if not request.json:
         return make_response({"json":"NO"})#abort(404)
@@ -213,7 +210,7 @@ def pay_insert():
 #-------------------------------- Update ------------------------------------------------------------
 @app.route('/api/v1/incubator/resources/payment/update', methods=['PUT'])
 def pay_update():
-    db.create_all()
+    # db.create_all()
 
     if not request.json:
         abort(404)
@@ -228,7 +225,7 @@ def pay_update():
 #--------------------------------- Delete -------------------------------------------------------------
 @app.route('/api/v1/incubator/resources/payment/delete/<id_>', methods=['DELETE'])
 def pay_delete(id_):
-    db.create_all()
+    # db.create_all()
 
     find_user = User.query.filter_by(user_id=int(id_)).first_or_404(description='record: not found')
     # print(find_vid)
@@ -241,7 +238,7 @@ def pay_delete(id_):
 # -----------------------------------GET ----------------------------------------------------------
 @app.route('/api/v1/incubator/resources/payment/read', methods=['GET'])
 def pay_read():
-    db.create_all()
+    # db.create_all()
     # result = db.engine.execute("SELECT * from video")
     jlist = []
     result = Payment.query.all()
@@ -259,7 +256,7 @@ def pay_read():
 
 @app.route('/api/v1/incubator/resources/address/insert', methods=['POST'])
 def addr_insert():
-    db.create_all()
+    # db.create_all()
     values=[]
     if not request.json:
         return make_response({"json":"NO"})#abort(404)
@@ -281,7 +278,7 @@ def addr_insert():
 #-------------------------------- Update ------------------------------------------------------------
 @app.route('/api/v1/incubator/resources/address/update', methods=['PUT'])
 def addr_update():
-    db.create_all()
+    # db.create_all()
 
     if not request.json:
         abort(404)
@@ -299,7 +296,7 @@ def addr_update():
 #--------------------------------- Delete -------------------------------------------------------------
 @app.route('/api/v1/incubator/resources/address/delete/<id_>', methods=['DELETE'])
 def addr_delete(id_):
-    db.create_all()
+    # db.create_all()
 
     find_user = User.query.filter_by(user_id=int(id_)).first_or_404(description='record: not found')
     
@@ -312,7 +309,7 @@ def addr_delete(id_):
 # -----------------------------------GET ----------------------------------------------------------
 @app.route('/api/v1/incubator/resources/address/read', methods=['GET'])
 def addr_read():
-    db.create_all()
+    # db.create_all()
     # result = db.engine.execute("SELECT * from video")
     jlist = []
     result = Address.query.all()
@@ -345,7 +342,7 @@ def video():
 
 @app.route('/api/v1/incubator/resources/video/update', methods=['PUT'])
 def vid_update():
-    db.create_all()
+    # db.create_all()
     print(request.json)
     upd = Video.query.filter_by(video_name=request.json['video_name']).first_or_404(description='record')
     if not request.json:
@@ -469,9 +466,11 @@ def doc_read():
 #######################################################################################################
 
 
-######################################## PAYMENT GATEWAY ##############################################
+######################################## PAYMENT GATEWAY route ##############################################
+# ------------------------------- generate order id ---------------------------------------------------
 @app.route('/api/v1/incubator/resources/orderid', methods=['POST'])
 def orderid():
+    # POST method is used when we use this route as api
     DATA={'amount':1000,'currency':'INR','receipt':"my_recept",'payment_capture':0}
     item = OrderId(DATA)
     item = item.get_with_id()
@@ -479,11 +478,52 @@ def orderid():
     json_item = json.loads(convert_to_json_item)
     # print(json_item)
     return str(json_item)
+
+#---------------------------------------------------------------------------------------------------
+
+#---------------------------------------- Payment making --------------------------------------------------------
+# user detail should be fetched from user session, like user id. (here user_id =1 has been used)
+@app.route('/payment')
+def pay():
+    key = razorpay_key
+    # print(key)
+    if not key:
+        return jsonify({'sorry':'not gateway api key'})
+    oid = orderid()
+    # print(oid)
+    if not oid:
+        return jsonify({'sorry':'not order id'})
+
+    # validating user
+    find_user = User.query.filter_by(user_id=1).first()
+    if not find_user:
+        return jsonify({'sorry':'not found'}), 404
+
+    return render_template('pay.html',key=key,oid=oid)
+
+@app.route('/payment/success', methods=['POST'])
+def successPay():
+    if not request.form:
+        return jsonify({'sorry':'No form fetched'})
     
-@app.route('/orderid')
-def q():
-    # DATA={'amount':1000,'currency':'INR','receipt':"my_recept",'payment_capture':0}
-    # item_1 = OrderId(DATA)
-    # print(item_1)
-    return "sucess", 201
-    # # return jsonify({'data':User.query.all()}
+    # Adding to subscription table
+    # Extract detail from form
+    # email = 'hbr8218@gmail.com'
+    # find_user = User.query.filter_by(email=email).first()
+
+    # start_date = datetime.datetime.now().date()#datetime.datetime.strptime(values[8], '%Y-%m-%d').date()
+    # end_date = start_date + datetime.timedelta(days=365)
+    # subs = Subscription(subs_start=start_date, subs_end=end_date, status=1, user=find_user)
+    
+    # db.session.add(subs)
+    # db.session.commit()
+
+    
+    # # send registration mail to user
+    
+    # print("receiver email address: ",email)
+    # sendMailTo(email)
+
+    return jsonify({'status':"Payment successful"})
+    
+########################################################################################################
