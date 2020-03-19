@@ -508,21 +508,21 @@ def successPay():
     
     # Adding to subscription table
     # Extract detail from form
-    # email = 'hbr8218@gmail.com'
-    # find_user = User.query.filter_by(email=email).first()
+    email = 'hbr8218@gmail.com'
+    find_user = User.query.filter_by(email=email).first()
 
-    # start_date = datetime.datetime.now().date()#datetime.datetime.strptime(values[8], '%Y-%m-%d').date()
-    # end_date = start_date + datetime.timedelta(days=365)
-    # subs = Subscription(subs_start=start_date, subs_end=end_date, status=1, user=find_user)
+    start_date = datetime.datetime.now().date()#datetime.datetime.strptime(values[8], '%Y-%m-%d').date()
+    end_date = start_date + datetime.timedelta(days=365)
+    subs = Subscription(subs_start=start_date, subs_end=end_date, status=1, user=find_user)
     
-    # db.session.add(subs)
-    # db.session.commit()
+    db.session.add(subs)
+    db.session.commit()
 
     
-    # # send registration mail to user
+    # send registration mail to user
     
-    # print("receiver email address: ",email)
-    # sendMailTo(email)
+    print("receiver email address: ",email)
+    sendMailTo(email)
 
     return jsonify({'status':"Payment successful"})
     
