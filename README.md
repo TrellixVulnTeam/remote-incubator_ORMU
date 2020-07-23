@@ -2,13 +2,11 @@
 
 ## Table of contents
 * [Overview and Technical Aspects](#overview-and-technical-aspects)
-* [Technical Aspect](#technical-aspect)
-* [System Settings](#system-settings)
-* [Installation](#installation)
+* [System Settings and Installation](#system-settings-and-installation)
 * [Run](#run)
 * [Technologies Used](#technologies-used)
 * [Bug Reques](#bug-request)
-* [Credits](#credits)
+
 
 ## Overview ad Technical Aspects
 This is backend API for the project <b>"Remote Incubator"</b> (a commercial e-tutorial) was being developed by a company named <b>"Fame Technologies pvt. ltd."</b> situated at Bangalore where I had been selected to work in this project as to develop the Backend API for the project in my four months internship/training period.
@@ -79,9 +77,12 @@ where PATH is the absolute path of your virtual environment(venv).
 To install all python modules required for this project ensure that virtual env(venv) is activated and run the following command:- </br>
 ```
 (venv) pip install -r requirements.txt
+(venv) python run.py
 ```
-</br>
-and Finally the application: </br>
-      ```
-      python run.py
-    ```
+
+## Technologies Used
+
+
+
+## Bug Request
+If you find any bug or have any suggestion, feel free to let me know @ hbr8218@gmail.com
