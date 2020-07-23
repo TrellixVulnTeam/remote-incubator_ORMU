@@ -39,8 +39,8 @@ This Api consists endpoints for the followings:-
       Run the following command to create virtual environment folder in the project's root directory. </br>
       `$ virtualenv venv`, where 'venv' is the name of your virtual environment for new python installed. </br>
       
-      Now you have to create some environment variables assigned your secret keys like database credential, your payment gateway credentials, etc. </br>
-      In ~/.barshrc file, you can add following variables at the bottom of the ~/.bashrc file which have been used in this project.
+Now you have to create some environment variables assigned your secret keys like database credential, your payment gateway credentials, etc. </br>
+In ~/.barshrc file, you can add following variables at the bottom of the ~/.bashrc file which have been used in this project.
       ```
       DB_USER="YOUR_DATABASE_USERNAME"
       DB_PASSWORD="YOUR_DATABASE_PASSWORD"
@@ -55,6 +55,33 @@ This Api consists endpoints for the followings:-
       export RAZOR_KEY
       export RAZOR_SECRET_KEY
       ```
-     <b>NOTE: </b> </br>
+<b>NOTE: </b> </br>
+1. YOUR HAVE REGISTER IN [RAZORPAY](https://www.razorpay.com/) TO GET REQUIRED API KEYS.
+2. INSTALL MYSQL AND CONFIGURE, IF YOU DON'T HAVE BEFORE.
+     
+  #### For Windows users:
+  Since I am not a windows OS user, I can't the exact procedure to install and configure all above mentionded dependencies.
+  1. Install python3 (Refer a good video or blog or official website documentation).
+  2. Create a virtual environment for the python installed for the project.
+  3. Create all above environment variables (Refer a video/blog on how to create environment variables in windows).
+  #### YET IF YOU ARE HAVING PROBLEM RUNNING THE PROJECT ON WINDOWS JUST LET ME KNOW.
+  <b>NOTE: </b> </br>
      1. YOUR HAVE REGISTER IN [RAZORPAY](https://www.razorpay.com/) TO GET REQUIRED API KEYS.
-     2. INTALL MYSQL, IF YOU DON'T HAVE BEFORE.
+     2. INSTALL MYSQL AND CONFIGURE, IF YOU DON'T HAVE BEFORE.
+     </br>
+ Activate the virtual environment using following commmand- </br>
+```
+source PATH/bin/activate
+```
+where PATH is the absolute path of your virtual environment(venv).
+
+## Run 
+To install all python modules required for this project ensure that virtual env(venv) is activated and run the following command:- </br>
+```
+(venv) pip install -r requirements.txt
+```
+</br>
+and Finally the application: </br>
+```
+(venv) python run.py
+````
