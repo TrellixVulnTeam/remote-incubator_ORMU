@@ -5,7 +5,7 @@
 * [System Settings and Installation](#system-settings-and-installation)
 * [Run](#run)
 * [Technologies Used](#technologies-used)
-* [Bug Reques](#bug-request)
+* [Bug Request](#bug-request)
 
 
 ## Overview ad Technical Aspects
@@ -82,7 +82,7 @@ To install all python modules required for this project ensure that virtual env(
 
 ## Technologies Used
 
-
+![WhatsApp Image 2020-07-23 at 20 30 21](https://user-images.githubusercontent.com/42790586/88302454-7fce5700-cd23-11ea-974d-77e2da56acad.jpeg)
 
 ## Bug Request
 If you find any bug or have any suggestion, feel free to let me know @ hbr8218@gmail.com
