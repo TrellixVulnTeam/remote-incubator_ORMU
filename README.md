@@ -81,4 +81,7 @@ To install all python modules required for this project ensure that virtual env(
 (venv) pip install -r requirements.txt
 ```
 </br>
- and Finally the application: </br>
+and Finally the application: </br>
+      ```
+      python run.py
+    ```
