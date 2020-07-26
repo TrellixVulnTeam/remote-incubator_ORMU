@@ -10,7 +10,7 @@
 
 ## Overview ad Technical Aspects
 This is backend API for the project <b>"Remote Incubator"</b> (a commercial e-tutorial) was being developed by a company named <b>"Fame Technologies pvt. ltd."</b> situated at Bangalore where I had been selected to work in this project as to develop the Backend API for the project in my four months internship/training period.
-This Api consists endpoints for the followings:- 
+This Api consists of endpoints for the followings:- 
   1. HTTP Services/requests (GET, POST, PUT, DELETE) for a user's login, registration logics i.e Registration table, login table, Address table, etc.
   2. HTTP Services/requests for Admin side like managing documents/video, give access to the paid user, etc.
   3. Payment Gateway
